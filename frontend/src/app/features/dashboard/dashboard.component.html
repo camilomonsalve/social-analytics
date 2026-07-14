@@ -1,12 +1,13 @@
 <div style="padding: 2rem; font-family: sans-serif;">
   <h1>Social Analytics</h1>
 
-  <ng-container *ngIf="checked; else loading">
-    <p *ngIf="connected" style="color: green;">✅ Backend conectado</p>
-    <p *ngIf="!connected" style="color: red;">❌ No se pudo conectar con el backend</p>
-  </ng-container>
-
-  <ng-template #loading>
+  @if (checked()) {
+    @if (connected()) {
+      <p style="color: green;">✅ Backend conectado</p>
+    } @else {
+      <p style="color: red;">❌ No se pudo conectar con el backend</p>
+    }
+  } @else {
     <p>Comprobando conexión con el backend...</p>
-  </ng-template>
+  }
 </div>

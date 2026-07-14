@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   postgres:
-    image: postgres:16
+    image: postgres:18
     container_name: social-analytics-postgres
     restart: unless-stopped
     environment:
@@ -12,14 +10,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
 
   pgadmin:
     image: dpage/pgadmin4
     container_name: social-analytics-pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@socialanalytics.local
+      PGADMIN_DEFAULT_EMAIL: admin@socialanalytics.dev
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"

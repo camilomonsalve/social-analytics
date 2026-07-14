@@ -1,28 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
 import { ApiService } from '../../core/api.service';
 
 @Component({
   selector: 'sa-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
-  connected = false;
-  checked = false;
+  connected = signal(false);
+  checked = signal(false);
 
   constructor(private readonly api: ApiService) {}
 
   ngOnInit(): void {
     this.api.getHealth().subscribe({
       next: (health) => {
-        this.connected = health.status === 'UP';
-        this.checked = true;
+        this.connected.set(health.status === 'UP');
+        this.checked.set(true);
       },
       error: () => {
-        this.connected = false;
-        this.checked = true;
+        this.connected.set(false);
+        this.checked.set(true);
       },
     });
   }
