@@ -43,3 +43,17 @@ Consecuencia en el código: Angular 22 cambia el valor por defecto de
 componentes que actualizan estado dentro de callbacks (por ejemplo, un
 `subscribe()` de HTTP) deben usar `signal()` en lugar de propiedades planas
 para que la vista se actualice correctamente.
+
+## ADR-008: GitHub Flow para gestión de branches
+Se adopta GitHub Flow en lugar de GitFlow simplificado. El flujo es:
+
+- **main**: rama principal, siempre desplegable
+- **feature/***: branches temporales para nuevas funcionalidades
+- Cada feature se mergea a main vía Pull Request
+- No hay rama develop ni release branches
+
+Ventajas para este proyecto:
+- Equipo pequeño → menos overhead
+- Despliegues continuos posibles
+- Simplicidad: solo dos tipos de branches
+- Encaja con sprints cortos y releases frecuentes
