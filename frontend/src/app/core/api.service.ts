@@ -6,6 +6,21 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface Profile {
+  id: string;
+  nombre: string;
+  descripcion: string | null;
+  foto: string | null;
+  categoria: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Category {
+  categoria: string;
+  count: number;
+}
+
 /**
  * Thin wrapper around the backend REST API.
  * Nothing else in the frontend should build API URLs directly -
@@ -19,5 +34,21 @@ export class ApiService {
 
   getHealth(): Observable<HealthStatus> {
     return this.http.get<HealthStatus>(`${this.baseUrl}/health`);
+  }
+
+  getProfiles(): Observable<Profile[]> {
+    return this.http.get<Profile[]>(`${this.baseUrl}/profiles`);
+  }
+
+  getProfileById(id: string): Observable<Profile> {
+    return this.http.get<Profile>(`${this.baseUrl}/profiles/${id}`);
+  }
+
+  getProfilesByCategory(categoria: string): Observable<Profile[]> {
+    return this.http.get<Profile[]>(`${this.baseUrl}/profiles/by-category/${categoria}`);
+  }
+
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.baseUrl}/profiles/categories`);
   }
 }
