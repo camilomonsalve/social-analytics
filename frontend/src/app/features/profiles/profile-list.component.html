@@ -1,0 +1,56 @@
+<div style="padding: 2rem; font-family: sans-serif;">
+  <h1>Perfiles</h1>
+
+  <div style="margin: 1rem 0;">
+    <label for="category-filter">Filtrar por categoría:</label>
+    <select 
+      id="category-filter" 
+      (change)="onCategoryChange($any($event.target).value)"
+      style="margin-left: 0.5rem; padding: 0.5rem;">
+      @for (cat of categories; track cat.value) {
+        <option [value]="cat.value" [selected]="selectedCategory() === cat.value">
+          {{ cat.label }}
+        </option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <p>Cargando perfiles...</p>
+  } @else if (error()) {
+    <p style="color: red;">{{ error() }}</p>
+  } @else if (profiles().length === 0) {
+    <p>No hay perfiles disponibles.</p>
+  } @else {
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+      @for (profile of profiles(); track profile.id) {
+        <div 
+          class="profile-card"
+          (click)="viewProfile(profile.id)"
+          style="border: 1px solid #ddd; padding: 1rem; border-radius: 8px; cursor: pointer;">
+          
+          @if (profile.foto) {
+            <img 
+              [src]="profile.foto" 
+              [alt]="profile.nombre"
+              style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 0.5rem;">
+          } @else {
+            <div 
+              style="width: 100%; height: 150px; background: #f0f0f0; border-radius: 4px; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; color: #999;">
+              Sin foto
+            </div>
+          }
+
+          <h3 style="margin: 0 0 0.5rem 0;">{{ profile.nombre }}</h3>
+          <p style="margin: 0 0 0.5rem 0; color: #666; font-size: 0.9rem;">
+            {{ profile.descripcion || 'Sin descripción' }}
+          </p>
+          <span 
+            style="display: inline-block; padding: 0.25rem 0.5rem; background: #e0e0e0; border-radius: 4px; font-size: 0.8rem;">
+            {{ profile.categoria }}
+          </span>
+        </div>
+      }
+    </div>
+  }
+</div>
