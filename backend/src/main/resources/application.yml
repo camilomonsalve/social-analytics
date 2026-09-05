@@ -10,11 +10,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:
         format_sql: true
+        show_sql: true
 
   flyway:
     enabled: true
@@ -28,3 +29,12 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /api-docs
+
+sync:
+  csv:
+    source-url: https://apoyaronaabelardo.org/datos.csv
+    connect-timeout-ms: 5000
+    read-timeout-ms: 15000
+  scheduler:
+    enabled: true
+    cron: "0 0 */6 * * *"

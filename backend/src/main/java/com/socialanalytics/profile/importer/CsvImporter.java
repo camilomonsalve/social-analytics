@@ -26,10 +26,14 @@ public class CsvImporter {
 
     private final ProfileService profileService;
     
-    private static final Set<String> VALID_CATEGORIES = Set.of("artistas", "empresas", "medios", "politica");
+    private static final Set<String> VALID_CATEGORIES = Set.of(
+            "artistas", "empresas", "medios", "politica",
+            "partidos", "lideres", "sindicatos"
+    );
 
-    public List<Profile> importFromCsv(InputStream inputStream) throws IOException {
+    public CsvImportResult importFromCsv(InputStream inputStream) throws IOException {
         List<Profile> profiles = new ArrayList<>();
+        int skipped = 0;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
@@ -39,23 +43,29 @@ public class CsvImporter {
                      .build())) {
 
             for (CSVRecord record : csvParser) {
-                Profile profile = parseRecord(record);
-                if (profile != null) {
-                    profiles.add(profile);
+                try {
+                    Profile profile = parseRecord(record);
+                    if (profile != null) {
+                        profiles.add(profile);
+                    } else {
+                        skipped++;
+                    }
+                } catch (Exception e) {
+                    log.warn("Skipping malformed record: {}", e.getMessage());
+                    skipped++;
                 }
             }
         }
 
-        log.info("Imported {} profiles from CSV", profiles.size());
-        return profiles;
+        log.info("Imported {} profiles from CSV, skipped {}", profiles.size(), skipped);
+        return new CsvImportResult(profiles, skipped);
     }
 
     private Profile parseRecord(CSVRecord record) {
         try {
             String nombre = record.get("nombre");
-            String descripcion = record.get("descripcion");
-            String foto = record.get("foto");
             String categoria = record.get("categoria");
+            String descripcion = record.get("descripcion");
 
             if (nombre == null || nombre.trim().isEmpty()) {
                 log.warn("Skipping record with empty nombre");
@@ -71,7 +81,7 @@ public class CsvImporter {
             return Profile.builder()
                     .nombre(nombre.trim())
                     .descripcion(descripcion != null ? descripcion.trim() : null)
-                    .foto(foto != null ? foto.trim() : null)
+                    .foto(null) // foto not present in current CSV schema; will be populated in future sprint
                     .categoria(trimmedCategoria)
                     .build();
 
@@ -85,16 +95,17 @@ public class CsvImporter {
     public void saveProfiles(List<Profile> profiles) {
         int created = 0;
         int updated = 0;
+        int unchanged = 0;
 
         for (Profile profile : profiles) {
-            boolean exists = profileService.upsertProfile(profile);
-            if (exists) {
-                updated++;
-            } else {
-                created++;
+            var result = profileService.upsertProfile(profile);
+            switch (result) {
+                case CREATED -> created++;
+                case UPDATED -> updated++;
+                case UNCHANGED -> unchanged++;
             }
         }
 
-        log.info("Saved {} profiles to database ({} created, {} updated)", profiles.size(), created, updated);
+        log.info("Saved {} profiles to database ({} created, {} updated, {} unchanged)", profiles.size(), created, updated, unchanged);
     }
 }

@@ -54,7 +54,7 @@ MetricSnapshot → Analytics → REST API → Angular
 ## Modelo de dominio (visión general)
 
 - **Profile**: entidad observada (persona, empresa, medio, partido). Categorías:
-  `artistas`, `empresas`, `medios`, `politica`.
+  `artistas`, `empresas`, `medios`, `politica`, `partidos`, `lideres`, `sindicatos`.
 - **SocialAccount**: cuenta de una red social asociada a un `Profile`.
 - **MetricSnapshot**: fotografía de métricas de una `SocialAccount` en un instante,
   usada para construir históricos y gráficas sin depender de que la red social

@@ -1,8 +1,8 @@
 # Social Analytics
 
 Plataforma que visualiza la evolución de perfiles sociales (artistas, empresas,
-medios, política) a partir de datos normalizados, independientemente de la
-plataforma de origen.
+medios, política, partidos, líderes, sindicatos) a partir de datos normalizados,
+independientemente de la plataforma de origen.
 
 - **backend/** — Spring Boot 3 (Java 21). Sincroniza un CSV fuente, consulta
   proveedores de redes sociales y expone una API REST versionada.
@@ -31,9 +31,3 @@ plataforma de origen.
    npm start
    ```
    Abre http://localhost:4200 — debería mostrar "✅ Backend conectado".
-
-## Estado
-
-Sprint 0 completado cuando los tres pasos anteriores funcionan de punta a punta.
-El siguiente paso es el módulo `profile`: importar `datos.csv` y exponer
-`GET /api/v1/profiles`.
