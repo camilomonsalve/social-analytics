@@ -34,6 +34,9 @@ public class Profile {
     @Column(name = "categoria", nullable = false, length = 50)
     private String categoria;
 
+    @Column(name = "content_hash", length = 64)
+    private String contentHash;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -58,18 +62,44 @@ public class ProfileService {
     }
 
     @Transactional
-    public boolean upsertProfile(Profile profile) {
+    public UpsertResult upsertProfile(Profile profile) {
+        String newHash = computeContentHash(profile);
         return profileRepository.findByNombre(profile.getNombre())
                 .map(existing -> {
+                    if (newHash.equals(existing.getContentHash())) {
+                        return UpsertResult.UNCHANGED;
+                    }
                     existing.setDescripcion(profile.getDescripcion());
                     existing.setFoto(profile.getFoto());
                     existing.setCategoria(profile.getCategoria());
+                    existing.setContentHash(newHash);
                     profileRepository.save(existing);
-                    return true;
+                    return UpsertResult.UPDATED;
                 })
                 .orElseGet(() -> {
+                    profile.setContentHash(newHash);
                     profileRepository.save(profile);
-                    return false;
+                    return UpsertResult.CREATED;
                 });
+    }
+
+    private String computeContentHash(Profile profile) {
+        String raw = String.join("|",
+                nullToEmpty(profile.getNombre()),
+                nullToEmpty(profile.getDescripcion()),
+                nullToEmpty(profile.getFoto()),
+                nullToEmpty(profile.getCategoria())
+        );
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
+    }
+
+    private String nullToEmpty(String value) {
+        return value != null ? value : "";
     }
 }

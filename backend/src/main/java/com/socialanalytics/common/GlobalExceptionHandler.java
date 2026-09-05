@@ -1,6 +1,7 @@
 package com.socialanalytics.common;
 
 import com.socialanalytics.profile.exception.ProfileNotFoundException;
+import com.socialanalytics.synchronization.exception.SyncException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,18 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(SyncException.class)
+    public ResponseEntity<ErrorResponse> handleSyncException(SyncException ex) {
+        log.warn("SyncException: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_GATEWAY.value())
+                .error("Bad Gateway")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(error);
     }
 
     @ExceptionHandler(Exception.class)

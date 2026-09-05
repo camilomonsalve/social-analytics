@@ -1,22 +1,23 @@
 # Roadmap
 
-## Sprint 0 — Base del proyecto ✅ (este commit)
+## Sprint 0 — Base del proyecto ✅
 - Estructura del repositorio (backend, frontend, docker, docs)
 - Docker Compose con PostgreSQL
 - `GET /api/v1/health`
 - Swagger disponible en `/swagger-ui.html`
 - Angular consumiendo `/health` y mostrando el estado de conexión
 
-## Sprint 1 — Módulo Profile
-- Migración `V1__create_profile_table.sql` (ya incluida)
+## Sprint 1 — Módulo Profile ✅
+- Migración `V1__create_profile_table.sql`
 - `CsvImporter` para `datos.csv` (https://apoyaronaabelardo.org/)
 - `Profile` entity, repository, service, mapper, DTO
 - `GET /api/v1/profiles`, `GET /api/v1/profiles/{id}`, `GET /api/v1/categories`
 - Angular: lista y detalle de perfiles
 
-## Sprint 2 — Sincronización automática
+## Sprint 2 — Sincronización automática ✅
 - `Scheduler` que descarga el CSV periódicamente
 - Detección de cambios (hash por perfil) y actualización incremental
+- `POST /api/v1/sync/trigger`, `GET /api/v1/sync/status`, `GET /api/v1/sync/history`
 
 ## Sprint 3 — Provider de Instagram
 - `SocialAccount` entity + migración

@@ -191,23 +191,49 @@ class ProfileServiceTest {
         Profile profile = Profile.builder().nombre("New").categoria("artistas").build();
         when(profileRepository.findByNombre("New")).thenReturn(Optional.empty());
 
-        boolean existed = profileService.upsertProfile(profile);
+        UpsertResult result = profileService.upsertProfile(profile);
 
-        assertFalse(existed);
+        assertEquals(UpsertResult.CREATED, result);
         verify(profileRepository).save(profile);
     }
 
     @Test
     void upsertProfileUpdatesWhenExists() {
-        Profile existing = Profile.builder().nombre("Test").categoria("artistas").descripcion("Old").build();
+        Profile existing = Profile.builder().nombre("Test").categoria("artistas").descripcion("Old").contentHash("oldhash").build();
         Profile incoming = Profile.builder().nombre("Test").categoria("empresas").descripcion("New").build();
         when(profileRepository.findByNombre("Test")).thenReturn(Optional.of(existing));
 
-        boolean existed = profileService.upsertProfile(incoming);
+        UpsertResult result = profileService.upsertProfile(incoming);
 
-        assertTrue(existed);
+        assertEquals(UpsertResult.UPDATED, result);
         assertEquals("New", existing.getDescripcion());
         assertEquals("empresas", existing.getCategoria());
+        assertNotNull(existing.getContentHash());
         verify(profileRepository).save(existing);
+    }
+
+    @Test
+    void upsertProfileReturnsUnchangedWhenContentIdentical() {
+        Profile initial = Profile.builder()
+                .nombre("Test")
+                .categoria("artistas")
+                .descripcion("Same")
+                .foto("same.jpg")
+                .build();
+        when(profileRepository.findByNombre("Test")).thenReturn(Optional.empty());
+        profileService.upsertProfile(initial); // CREATED — mutates `initial`, setting its real contentHash
+
+        Profile incoming = Profile.builder()
+                .nombre("Test")
+                .categoria("artistas")
+                .descripcion("Same")
+                .foto("same.jpg")
+                .build();
+        when(profileRepository.findByNombre("Test")).thenReturn(Optional.of(initial));
+
+        UpsertResult result = profileService.upsertProfile(incoming);
+
+        assertEquals(UpsertResult.UNCHANGED, result);
+        verify(profileRepository, times(1)).save(any()); // only the first (CREATE) call should have saved
     }
 }

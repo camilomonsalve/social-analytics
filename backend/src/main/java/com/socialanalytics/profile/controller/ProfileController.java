@@ -3,6 +3,7 @@ package com.socialanalytics.profile.controller;
 import com.socialanalytics.profile.dto.CategoryResponse;
 import com.socialanalytics.profile.dto.ProfileResponse;
 import com.socialanalytics.profile.entity.Profile;
+import com.socialanalytics.profile.importer.CsvImportResult;
 import com.socialanalytics.profile.importer.CsvImporter;
 import com.socialanalytics.profile.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +35,7 @@ public class ProfileController {
     @GetMapping("/by-category/{categoria}")
     @Operation(summary = "Get profiles by category", description = "Retrieve all profiles belonging to a specific category")
     public List<ProfileResponse> getProfilesByCategory(
-            @Parameter(description = "Category name (artistas, empresas, medios, politica)", required = true)
+            @Parameter(description = "Category name (artistas, empresas, medios, politica, partidos, lideres, sindicatos)", required = true)
             @PathVariable String categoria) {
         return profileService.getProfilesByCategory(categoria);
     }
@@ -54,10 +55,13 @@ public class ProfileController {
             throw new IllegalArgumentException("File is empty");
         }
 
-        List<Profile> profiles = csvImporter.importFromCsv(file.getInputStream());
-        csvImporter.saveProfiles(profiles);
+        CsvImportResult importResult = csvImporter.importFromCsv(file.getInputStream());
+        csvImporter.saveProfiles(importResult.profiles());
 
-        return "Successfully imported " + profiles.size() + " profiles";
+        if (importResult.skippedCount() > 0) {
+            return "Successfully imported " + importResult.profiles().size() + " profiles (skipped " + importResult.skippedCount() + " invalid rows)";
+        }
+        return "Successfully imported " + importResult.profiles().size() + " profiles";
     }
 
     @GetMapping("/{id}")

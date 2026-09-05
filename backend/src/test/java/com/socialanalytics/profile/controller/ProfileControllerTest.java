@@ -49,8 +49,8 @@ class ProfileControllerTest {
 
     @Test
     void importProfilesReturnsSuccess() throws Exception {
-        String csvContent = "nombre,descripcion,foto,categoria\n" +
-                "Test Profile,Description,https://example.com/test.jpg,artistas";
+        String csvContent = "nombre,categoria,descripcion\n" +
+                "Test Profile,artistas,Description";
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "profiles.csv",
